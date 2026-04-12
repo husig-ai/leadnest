@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Safety & Account Deletion — Leadswrap by Husig</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0c0f14;
+      --bg2:     #121720;
+      --bg3:     #181e2a;
+      --border:  rgba(255,255,255,0.07);
+      --gold:    #c9a84c;
+      --gold-lt: #e8c87a;
+      --cream:   #f0e8d6;
+      --muted:   #7a8090;
+      --text:    #c8c2b8;
+      --green:   #4caf7d;
+      --green-bg: rgba(76,175,125,0.08);
+      --green-border: rgba(76,175,125,0.25);
+      --red:     #e06060;
+      --red-bg:  rgba(220,80,80,0.08);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 4rem;
+      background: rgba(12,15,20,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-lt));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #0c0f14;
+    }
+
+    .logo-text {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--cream);
+    }
+
+    .logo-text span { color: var(--gold); }
+
+    .nav-back {
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .nav-back:hover { color: var(--cream); }
+
+    /* LAYOUT */
+    .page-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 5rem 2rem 7rem;
+    }
+
+    /* HEADER */
+    .pp-header {
+      margin-bottom: 3.5rem;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pp-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .pp-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      color: var(--cream);
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+
+    .pp-meta {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .pp-meta strong { color: var(--text); }
+
+    /* CALLOUT */
+    .callout {
+      background: rgba(201,168,76,0.06);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-left: 3px solid var(--gold);
+      border-radius: 0 8px 8px 0;
+      padding: 1rem 1.4rem;
+      margin: 0 0 3rem;
+    }
+
+    .callout p {
+      font-size: 0.88rem;
+      color: var(--cream);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* TOC */
+    .toc {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.8rem 2rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .toc-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .toc ol {
+      list-style: decimal;
+      padding-left: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .toc a {
+      text-decoration: none;
+      font-size: 0.88rem;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+
+    .toc a:hover { color: var(--cream); }
+
+    /* SECTIONS */
+    .pp-section {
+      margin-bottom: 3.5rem;
+      scroll-margin-top: 5rem;
+    }
+
+    .pp-section h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+
+    .section-num {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--gold);
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 4px;
+      padding: 0.15rem 0.45rem;
+      letter-spacing: 0.06em;
+      font-family: 'Syne', sans-serif;
+    }
+
+    .pp-section p {
+      font-size: 0.92rem;
+      color: var(--text);
+      margin-bottom: 1rem;
+      line-height: 1.75;
+    }
+
+    .pp-section h3 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--cream);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 1.8rem 0 0.8rem;
+    }
+
+    /* DATA TABLE */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+    }
+
+    .data-table thead {
+      background: var(--bg3);
+    }
+
+    .data-table th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .data-table td {
+      padding: 0.75rem 1rem;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:nth-child(even) td { background: rgba(255,255,255,0.015); }
+
+    /* BADGES */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+
+    .badge-yes  { background: var(--green-bg); border: 1px solid var(--green-border); color: var(--green); }
+    .badge-no   { background: var(--red-bg); border: 1px solid rgba(220,80,80,0.25); color: var(--red); }
+    .badge-enc  { background: rgba(61,139,255,0.08); border: 1px solid rgba(61,139,255,0.25); color: #6aaeff; }
+
+    /* STATUS CARD */
+    .status-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem 1.8rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .status-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+
+    .status-icon.green { background: var(--green-bg); border: 1px solid var(--green-border); }
+    .status-icon.gold  { background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.25); }
+    .status-icon.blue  { background: rgba(61,139,255,0.08); border: 1px solid rgba(61,139,255,0.25); }
+
+    .status-body {}
+    .status-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 0.25rem;
+    }
+
+    .status-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* ACTION CARD — deletion request box */
+    .action-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem;
+      margin-top: 1.2rem;
+    }
+
+    .action-card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 0.4rem;
+    }
+
+    .action-card-sub {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 1.4rem;
+      line-height: 1.55;
+    }
+
+    .action-steps {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-bottom: 1.4rem;
+      counter-reset: astep;
+    }
+
+    .action-steps li {
+      counter-increment: astep;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      font-size: 0.88rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .action-steps li::before {
+      content: counter(astep);
+      background: rgba(201,168,76,0.12);
+      border: 1px solid rgba(201,168,76,0.25);
+      color: var(--gold);
+      font-size: 0.72rem;
+      font-weight: 700;
+      min-width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 0.05rem;
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, var(--gold), var(--gold-lt));
+      color: #0c0f14;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.03em;
+      padding: 0.7rem 1.5rem;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(201,168,76,0.25);
+    }
+
+    .action-btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: transparent;
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-weight: 500;
+      font-size: 0.85rem;
+      padding: 0.7rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .action-btn-ghost:hover {
+      border-color: rgba(255,255,255,0.2);
+      color: var(--cream);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    /* RETENTION TABLE */
+    .retention-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .ret-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.2rem;
+    }
+
+    .ret-type {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 0.35rem;
+    }
+
+    .ret-period {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 0.2rem;
+    }
+
+    .ret-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* CONTACT CARD */
+    .contact-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-top: 1.2rem;
+    }
+
+    .contact-card p {
+      font-size: 0.88rem;
+      margin-bottom: 0.4rem;
+      color: var(--text);
+    }
+
+    .contact-card a {
+      color: var(--gold-lt);
+      text-decoration: none;
+    }
+
+    .contact-card a:hover { text-decoration: underline; }
+
+    /* FOOTER */
+    footer {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-brand {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .footer-brand strong { color: var(--gold); }
+
+    .footer-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .footer-links a {
+      text-decoration: none;
+      font-size: 0.8rem;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--cream); }
+
+    @media (max-width: 700px) {
+      nav { padding: 1rem 1.5rem; }
+      .page-wrap { padding: 3rem 1.5rem 5rem; }
+      .retention-row { grid-template-columns: 1fr; }
+      .data-table { font-size: 0.78rem; }
+      .data-table th, .data-table td { padding: 0.6rem 0.75rem; }
+      footer { padding: 2rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="logo">
+      <div class="logo-mark">LW</div>
+      <span class="logo-text">Leads<span>Wrap</span></span>
+    </a>
+    <a href="index.html" class="nav-back">← Back to Home</a>
+  </nav>
+
+  <div class="page-wrap">
+
+    <!-- HEADER -->
+    <div class="pp-header">
+      <span class="pp-tag">Google Play · Data Safety</span>
+      <h1 class="pp-title">Data Safety &amp;<br />Account Deletion</h1>
+      <p class="pp-meta">
+        <strong>App:</strong> Leadswrap &nbsp;·&nbsp;
+        <strong>Developer:</strong> Husig &nbsp;·&nbsp;
+        <strong>Last Updated:</strong> April 2026
+      </p>
+    </div>
+
+    <div class="callout">
+      <p>This page fulfils Google Play's data safety disclosure requirements and provides clear instructions for users who wish to delete their account or request removal of their personal data. All requests are handled within <strong>30 days</strong>.</p>
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+      <div class="toc-title">On this page</div>
+      <ol>
+        <li><a href="#s1">Data Safety Summary</a></li>
+        <li><a href="#s2">Data Collected &amp; Shared</a></li>
+        <li><a href="#s3">Security Practices</a></li>
+        <li><a href="#s4">Delete Your Account</a></li>
+        <li><a href="#s5">Delete Specific Data (Without Deleting Account)</a></li>
+        <li><a href="#s6">Data Retained After Deletion</a></li>
+        <li><a href="#s7">Contact &amp; Support</a></li>
+      </ol>
+    </div>
+
+    <!-- SECTION 1 — DATA SAFETY SUMMARY -->
+    <div class="pp-section" id="s1">
+      <h2><span class="section-num">01</span> Data Safety Summary</h2>
+
+      <div class="status-card">
+        <div class="status-icon green">✓</div>
+        <div class="status-body">
+          <div class="status-title">Data is collected and shared</div>
+          <div class="status-desc">Leadswrap collects user data to operate the platform. See Section 2 for the full breakdown of what is collected and why.</div>
+        </div>
+      </div>
+
+      <div class="status-card">
+        <div class="status-icon blue">🔒</div>
+        <div class="status-body">
+          <div class="status-title">All data is encrypted in transit</div>
+          <div class="status-desc">Every connection between your device and our servers is encrypted using HTTPS/TLS. Data at rest in our database is protected with access controls and role-based permissions.</div>
+        </div>
+      </div>
+
+      <div class="status-card">
+        <div class="status-icon gold">👤</div>
+        <div class="status-body">
+          <div class="status-title">Account creation: Username and password</div>
+          <div class="status-desc">Leadswrap accounts are created with an email address and password. Passwords are stored as secure hashes — we never store plaintext credentials. The app does not currently support OAuth or third-party sign-in.</div>
+        </div>
+      </div>
+
+      <div class="status-card">
+        <div class="status-icon green">🗑️</div>
+        <div class="status-body">
+          <div class="status-title">You can request deletion of your account and data</div>
+          <div class="status-desc">Users may request full account deletion or removal of specific data at any time. See Sections 4 and 5 for instructions.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2 — DATA COLLECTED & SHARED -->
+    <div class="pp-section" id="s2">
+      <h2><span class="section-num">02</span> Data Collected &amp; Shared</h2>
+      <p>The table below lists every required user data type that Leadswrap collects, why it is collected, whether it is shared with third parties, and whether it is optional.</p>
+
+      <h3>Personal Information</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data Type</th>
+            <th>Purpose</th>
+            <th>Shared</th>
+            <th>Required</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Name</td>
+            <td>Account identity; displayed within the app</td>
+            <td><span class="badge badge-no">No</span></td>
+            <td><span class="badge badge-yes">Yes</span></td>
+          </tr>
+          <tr>
+            <td>Email address</td>
+            <td>Account login, notifications, support</td>
+            <td><span class="badge badge-no">No</span></td>
+            <td><span class="badge badge-yes">Yes</span></td>
+          </tr>
+          <tr>
+            <td>Phone number</td>
+            <td>Account identity; agent contact</td>
+            <td><span class="badge badge-no">No</span></td>
+            <td><span class="badge badge-yes">Yes</span></td>
+          </tr>
+          <tr>
+            <td>Password (hashed)</td>
+            <td>Account authentication</td>
+            <td><span class="badge badge-no">No</span></td>
+            <td><span class="badge badge-yes">Yes</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Lead &amp; Business Data</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data Type</th>
+            <th>Purpose</th>
+            <th>Shared</th>
+            <th>Required</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Lead contact info (name, phone, email)</td>
+            <td>Core CRM functionality — storing and managing property leads</td>
+            <td><span class="badge badge-no">No</span></td>
+            <td><span class="badge badge-yes">Yes</span></td>
+          </tr>
+          <tr>
+            <td>Lead preferences &amp; budget</td>
+            <td>AI lead scoring (LPMAMA) and property matching</td>
+            <td><span class="badge badge-no">No</span></td>
+            <td><span class="badge badge-yes">Yes</span></td>
+          </tr>
+          <tr>
+            <td>Messages &amp; notes</td>
+            <td>In-app communication logs linked to lead records</td>
+            <td><span class="badge badge-no">No</span></td>
+            <td>Optional</td>
+          </tr>
+          <tr>
+            <td>Property listings &amp; images</td>
+            <td>Property management and lead matching</td>
+            <td><span class="badge badge-no">No</span></td>
+            <td>Optional</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Device &amp; App Data</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data Type</th>
+            <th>Purpose</th>
+            <th>Shared</th>
+            <th>Required</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Device / FCM push token</td>
+            <td>Delivering push notifications and reminders</td>
+            <td><span class="badge badge-yes">Firebase (Google)</span></td>
+            <td>Optional</td>
+          </tr>
+          <tr>
+            <td>IP address &amp; device info</td>
+            <td>Security, fraud prevention, server diagnostics</td>
+            <td><span class="badge badge-no">No</span></td>
+            <td>Automatic</td>
+          </tr>
+          <tr>
+            <td>App usage &amp; crash logs</td>
+            <td>App stability, performance monitoring</td>
+            <td><span class="badge badge-no">No</span></td>
+            <td>Automatic</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p style="margin-top:0.5rem;">We do <strong>not</strong> sell any user data to third parties. The only external data sharing is push notification tokens transmitted to Firebase/Google solely to deliver notifications you have opted into.</p>
+    </div>
+
+    <!-- SECTION 3 — SECURITY -->
+    <div class="pp-section" id="s3">
+      <h2><span class="section-num">03</span> Security Practices</h2>
+
+      <div class="status-card">
+        <div class="status-icon blue">🔐</div>
+        <div class="status-body">
+          <div class="status-title">Encrypted in transit — Yes</div>
+          <div class="status-desc">All data exchanged between the Leadswrap app and our servers travels over HTTPS/TLS. This applies to all API calls, authentication, and file uploads.</div>
+        </div>
+      </div>
+
+      <div class="status-card">
+        <div class="status-icon green">🛡️</div>
+        <div class="status-body">
+          <div class="status-title">Passwords hashed, never stored in plaintext</div>
+          <div class="status-desc">Passwords are one-way hashed before storage. Even our engineers cannot read your password.</div>
+        </div>
+      </div>
+
+      <div class="status-card">
+        <div class="status-icon gold">🔑</div>
+        <div class="status-body">
+          <div class="status-title">Token-based authentication with short expiry</div>
+          <div class="status-desc">Session tokens expire automatically. Suspicious sessions can be invalidated remotely.</div>
+        </div>
+      </div>
+
+      <div class="status-card">
+        <div class="status-icon blue">🗄️</div>
+        <div class="status-body">
+          <div class="status-title">Role-based database access controls</div>
+          <div class="status-desc">Database access is restricted to authenticated services only. No direct external database exposure.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4 — DELETE ACCOUNT -->
+    <div class="pp-section" id="s4">
+      <h2><span class="section-num">04</span> Delete Your Account</h2>
+      <p>You may request deletion of your Leadswrap account at any time. When your account is deleted, the following happens:</p>
+
+      <div class="action-card">
+        <div class="action-card-title">What gets deleted</div>
+        <div class="action-card-sub">Upon confirmed account deletion, we permanently remove:</div>
+        <ul class="action-steps">
+          <li>Your agent profile (name, email, phone number, hashed password)</li>
+          <li>All lead records associated with your account, including contact details, LPMAMA scores, and audit history</li>
+          <li>All messages, notes, and reminders linked to your leads</li>
+          <li>Property listings and matched lead associations you created</li>
+          <li>Your FCM push notification token</li>
+        </ul>
+      </div>
+
+      <div class="action-card" style="margin-top: 1rem;">
+        <div class="action-card-title">How to request account deletion</div>
+        <div class="action-card-sub">Follow these steps to submit your deletion request. We will confirm and process it within <strong>30 days</strong>.</div>
+        <ol class="action-steps">
+          <li>Send an email to <strong>contact@husig.ai</strong> with the subject line: <em>"Leadswrap — Account Deletion Request"</em></li>
+          <li>Include the email address associated with your Leadswrap account so we can verify your identity.</li>
+          <li>We will send a confirmation email within 2 business days. Reply to confirm you authorise the deletion.</li>
+          <li>Your account and all associated data will be permanently deleted within 30 days of your confirmation.</li>
+        </ol>
+        <div class="btn-row">
+          <a href="mailto:contact@husig.ai?subject=Leadswrap%20%E2%80%94%20Account%20Deletion%20Request&body=Hi%20Husig%20team%2C%0A%0AI%20would%20like%20to%20request%20deletion%20of%20my%20Leadswrap%20account.%0A%0AAccount%20email%3A%20%5Byour%20email%20here%5D%0A%0APlease%20delete%20my%20account%20and%20all%20associated%20data.%0A%0AThank%20you." class="action-btn">📧 Email Deletion Request</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 5 — DELETE SPECIFIC DATA -->
+    <div class="pp-section" id="s5">
+      <h2><span class="section-num">05</span> Delete Specific Data (Without Deleting Account)</h2>
+      <p>You do not need to delete your entire account to remove specific data. Leadswrap supports data deletion at the record level:</p>
+
+      <div class="status-card">
+        <div class="status-icon green">✓</div>
+        <div class="status-body">
+          <div class="status-title">Delete individual lead records</div>
+          <div class="status-desc">You can delete any lead record directly within the app at any time. Deletion removes the lead, its contact details, messages, notes, and scoring history permanently.</div>
+        </div>
+      </div>
+
+      <div class="status-card">
+        <div class="status-icon green">✓</div>
+        <div class="status-body">
+          <div class="status-title">Delete messages and notes</div>
+          <div class="status-desc">Individual notes and messages can be removed from within the app without affecting other lead data.</div>
+        </div>
+      </div>
+
+      <div class="status-card">
+        <div class="status-icon green">✓</div>
+        <div class="status-body">
+          <div class="status-title">Remove push notification access</div>
+          <div class="status-desc">You can disable push notifications at any time from your device settings or within the app. This will remove your FCM token from our servers.</div>
+        </div>
+      </div>
+
+      <div class="action-card" style="margin-top:1.5rem;">
+        <div class="action-card-title">Request deletion of specific data by email</div>
+        <div class="action-card-sub">If you need us to delete specific data on your behalf — for example, data you cannot access directly in the app — contact us with the details below.</div>
+        <ol class="action-steps">
+          <li>Email <strong>contact@husig.ai</strong> with subject: <em>"Leadswrap — Data Deletion Request"</em></li>
+          <li>Specify which data you want deleted (e.g., a specific lead record, all messages, your usage logs).</li>
+          <li>We will confirm receipt within 2 business days and complete the deletion within 30 days.</li>
+        </ol>
+        <div class="btn-row">
+          <a href="mailto:contact@husig.ai?subject=Leadswrap%20%E2%80%94%20Data%20Deletion%20Request&body=Hi%20Husig%20team%2C%0A%0AI%20would%20like%20to%20request%20deletion%20of%20specific%20data%20from%20my%20Leadswrap%20account.%0A%0AAccount%20email%3A%20%5Byour%20email%20here%5D%0A%0AData%20to%20delete%3A%20%5Bplease%20describe%5D%0A%0AThank%20you." class="action-btn">📧 Email Data Request</a>
+          <a href="privacy_policy.html" class="action-btn-ghost">Full Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 6 — RETENTION AFTER DELETION -->
+    <div class="pp-section" id="s6">
+      <h2><span class="section-num">06</span> Data Retained After Deletion</h2>
+      <p>Some data may be retained for a limited period after a deletion request for legal compliance and service integrity. The table below is transparent about what is kept, and for how long.</p>
+
+      <div class="retention-row">
+        <div class="ret-card">
+          <div class="ret-type">Account data</div>
+          <div class="ret-period">90 days</div>
+          <div class="ret-desc">Retained after account deletion to allow recovery if the request was made in error. Permanently deleted after this window.</div>
+        </div>
+        <div class="ret-card">
+          <div class="ret-type">Audit logs</div>
+          <div class="ret-period">Up to 12 months</div>
+          <div class="ret-desc">Compliance and dispute resolution records. These do not contain lead personal data — only action metadata (e.g., "status changed to QUALIFIED").</div>
+        </div>
+        <div class="ret-card">
+          <div class="ret-type">Server / usage logs</div>
+          <div class="ret-period">30–90 days</div>
+          <div class="ret-desc">Automatically purged on a rolling basis regardless of account status. These contain IP addresses and request metadata, not content.</div>
+        </div>
+      </div>
+
+      <p style="margin-top:1.2rem; font-size: 0.88rem; color: var(--muted);">After the retention periods above, all data is permanently and irreversibly deleted from our systems and backups. We do not archive deleted user data beyond these windows.</p>
+    </div>
+
+    <!-- SECTION 7 — CONTACT -->
+    <div class="pp-section" id="s7">
+      <h2><span class="section-num">07</span> Contact &amp; Support</h2>
+      <p>For any privacy, data safety, or deletion enquiries, please contact us directly. We aim to respond within 2 business days and fulfil all requests within 30 days.</p>
+      <div class="contact-card">
+        <p><strong>Husig — Leadswrap Support</strong></p>
+        <p>Kathmandu, Nepal</p>
+        <p>Email: <a href="mailto:contact@husig.ai">contact@husig.ai</a></p>
+        <p>Website: <a href="https://husig.ai" target="_blank">husig.ai</a></p>
+        <p>Privacy Policy: <a href="privacy_policy.html">View full privacy policy</a></p>
+        <p style="margin-top: 1rem; font-size: 0.82rem; color: var(--muted);">When emailing, please include your account email address and describe your request clearly so we can process it promptly.</p>
+      </div>
+    </div>
+
+  </div><!-- /page-wrap -->
+
+  <footer>
+    <div class="footer-brand">
+      © 2026 <strong>Husig</strong> — Leadswrap. All rights reserved.
+    </div>
+    <ul class="footer-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="privacy_policy.html">Privacy Policy</a></li>
+      <li><a href="mailto:contact@husig.ai">Contact</a></li>
+    </ul>
+  </footer>
+
+</body>
+</html>
